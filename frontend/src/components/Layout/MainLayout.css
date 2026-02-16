@@ -1,0 +1,76 @@
+/* Hamza durandhar Hybrid Integration Layout - Black & White Theme */
+
+/* Header - Dark Theme */
+.cds--header {
+  background-color: var(--wm-dark-header);
+  border-bottom: 1px solid var(--wm-border-subtle);
+  height: 48px;
+  z-index: 8000;
+}
+
+.cds--header__name {
+  font-size: 0.875rem;
+  font-weight: 400;
+  color: var(--cds-text-inverse);
+  letter-spacing: 0.16px;
+}
+
+.cds--header__name--prefix {
+  font-weight: 600;
+  color: var(--cds-text-inverse);
+}
+
+/* Content area - White/Light Theme */
+.cds--content {
+  min-height: calc(100vh - 48px);
+  padding: 2rem;
+  background-color: #ffffff;
+  margin-top: 48px;
+  margin-left: 0;
+}
+
+/* Responsive Design */
+@media (max-width: 1056px) {
+  .cds--content {
+    padding: 1.5rem;
+  }
+  
+  .cds--header__name {
+    font-size: 0.8125rem;
+  }
+}
+
+@media (max-width: 672px) {
+  .cds--content {
+    padding: 1rem;
+  }
+  
+  .cds--header__name--prefix {
+    display: none;
+  }
+}
+
+/* Smooth Scrolling */
+.cds--content {
+  scroll-behavior: smooth;
+}
+
+/* Custom Scrollbar for Content */
+.cds--content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.cds--content::-webkit-scrollbar-track {
+  background: var(--hamza-gray-10);
+}
+
+.cds--content::-webkit-scrollbar-thumb {
+  background: var(--hamza-gray-50);
+  border-radius: 4px;
+}
+
+.cds--content::-webkit-scrollbar-thumb:hover {
+  background: var(--hamza-gray-70);
+}
+
+/* Made with Bob */

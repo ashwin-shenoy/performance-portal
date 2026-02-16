@@ -1,0 +1,70 @@
+# BuildConfig for backend - builds from Dockerfile in the repo
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: backend
+  namespace: perf-portal
+  labels:
+    app.kubernetes.io/name: backend
+    app.kubernetes.io/part-of: performance-portal
+spec:
+  source:
+    type: Binary
+    binary: {}
+  strategy:
+    type: Docker
+    dockerStrategy:
+      dockerfilePath: Dockerfile
+  output:
+    to:
+      kind: ImageStreamTag
+      name: backend:latest
+  resources:
+    limits:
+      cpu: "2"
+      memory: 4Gi
+---
+# BuildConfig for frontend
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: frontend
+  namespace: perf-portal
+  labels:
+    app.kubernetes.io/name: frontend
+    app.kubernetes.io/part-of: performance-portal
+spec:
+  source:
+    type: Binary
+    binary: {}
+  strategy:
+    type: Docker
+    dockerStrategy:
+      dockerfilePath: Dockerfile
+  output:
+    to:
+      kind: ImageStreamTag
+      name: frontend:latest
+  resources:
+    limits:
+      cpu: "1"
+      memory: 2Gi
+---
+# ImageStreams
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: backend
+  namespace: perf-portal
+  labels:
+    app.kubernetes.io/name: backend
+    app.kubernetes.io/part-of: performance-portal
+---
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: frontend
+  namespace: perf-portal
+  labels:
+    app.kubernetes.io/name: frontend
+    app.kubernetes.io/part-of: performance-portal

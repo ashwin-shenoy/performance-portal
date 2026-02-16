@@ -1,0 +1,254 @@
+.capability-details {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.capability-hero {
+  background: radial-gradient(circle at top right, rgba(36, 161, 72, 0.2), transparent 55%),
+    linear-gradient(135deg, #0a0a0a 0%, #1f1f1f 55%, #2f2f2f 100%);
+  color: #ffffff;
+  border: none;
+  padding: 2.5rem;
+}
+
+.capability-hero-inner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+}
+
+.capability-hero-title {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.capability-hero-icon {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 0.85rem;
+  border-radius: 16px;
+}
+
+.capability-hero h1 {
+  margin: 0;
+  font-size: 2.2rem;
+  font-weight: 500;
+}
+
+.capability-hero p {
+  margin: 0.5rem 0 0 0;
+  opacity: 0.8;
+}
+
+.capability-hero-actions {
+  display: flex;
+  gap: 1rem;
+}
+
+.capability-alert {
+  margin-bottom: 0.5rem;
+}
+
+.capability-summary {
+  margin-bottom: 0.5rem;
+}
+
+.summary-tile {
+  padding: 1.5rem;
+  border: 1px solid #e0e0e0;
+}
+
+.summary-label {
+  margin: 0;
+  font-size: 0.85rem;
+  color: #525252;
+}
+
+.summary-value {
+  margin: 0.5rem 0 0 0;
+  font-size: 1.8rem;
+  font-weight: 600;
+  color: #000000;
+}
+
+.capability-filter-panel {
+  padding: 1.5rem;
+  border: 1px solid #e0e0e0;
+  background: #ffffff;
+}
+
+.capability-table {
+  padding: 1.5rem;
+}
+
+.capability-testcases {
+  padding: 1.5rem;
+}
+
+.capability-metadata {
+  padding: 1.5rem;
+}
+
+.capability-baseline {
+  padding: 1.5rem;
+}
+
+.capability-architecture {
+  padding: 1.5rem;
+}
+
+.metadata-controls {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-end;
+  margin: 1.5rem 0;
+  flex-wrap: wrap;
+}
+
+.architecture-uploader {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.architecture-file {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  background: #f4f4f4;
+  border-radius: 4px;
+}
+
+.architecture-file-name {
+  font-weight: 500;
+}
+
+.architecture-file-meta {
+  color: #525252;
+  font-size: 0.875rem;
+}
+
+.architecture-current {
+  display: flex;
+  gap: 0.5rem;
+  align-items: baseline;
+  color: #525252;
+  font-size: 0.9rem;
+}
+
+.architecture-current-label {
+  font-weight: 500;
+}
+
+.architecture-actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.architecture-preview {
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.architecture-preview img {
+  display: block;
+  width: 100%;
+  max-height: 320px;
+  object-fit: contain;
+  background: #f9f9f9;
+}
+
+.baseline-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 1rem;
+}
+
+.testcase-controls {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-end;
+  margin: 1.5rem 0;
+  flex-wrap: wrap;
+}
+
+.testcase-cell {
+  white-space: normal;
+  max-width: 320px;
+  line-height: 1.4;
+  color: #525252;
+}
+
+.capability-table-header h3 {
+  margin: 0 0 0.4rem 0;
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+
+.capability-table-header p {
+  margin: 0;
+  color: #525252;
+}
+
+.capability-actions {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.capability-empty {
+  text-align: center;
+  padding: 2.5rem 1rem;
+  color: #525252;
+}
+
+.capability-guidance {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1.5rem;
+  padding: 1.5rem;
+  background: #f4f4f4;
+  border: 1px solid #e0e0e0;
+}
+
+.capability-guidance h3 {
+  margin: 0 0 0.75rem 0;
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.capability-guidance ul {
+  margin: 0;
+  padding-left: 1.1rem;
+  color: #262626;
+}
+
+.capability-guidance li {
+  margin-bottom: 0.5rem;
+}
+
+.capability-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding-top: 0.5rem;
+}
+
+@media (max-width: 900px) {
+  .capability-hero-inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .capability-hero-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}

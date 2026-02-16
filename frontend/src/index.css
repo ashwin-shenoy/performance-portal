@@ -1,0 +1,331 @@
+/* Hamza Carbon Design System - Custom Theme Configuration */
+@import '@carbon/styles/css/styles.min.css';
+@import '@carbon/charts-react/styles.min.css';
+
+/* Hamza durandhar Hybrid Integration Color Palette - Black & White Theme */
+:root {
+  /* Primary Dark Theme Colors - Black & White */
+  --wm-dark-bg: #000000;
+  --wm-dark-header: #000000;
+  --wm-dark-sidebar: #000000;
+  --wm-content-bg: #ffffff;
+  
+  /* Neutral Interactive Colors - Black & White */
+  --cds-interactive-01: #000000;
+  --cds-interactive-02: #262626;
+  --cds-interactive-03: #000000;
+  --cds-interactive-04: #262626;
+  
+  /* UI Colors - White Content Area */
+  --cds-ui-background: #ffffff;
+  --cds-ui-01: #f4f4f4;
+  --cds-ui-02: #ffffff;
+  --cds-ui-03: #e0e0e0;
+  --cds-ui-04: #8d8d8d;
+  --cds-ui-05: #000000;
+  
+  /* Text Colors */
+  --cds-text-01: #000000;
+  --cds-text-02: #525252;
+  --cds-text-03: #8d8d8d;
+  --cds-text-04: #ffffff;
+  --cds-text-inverse: #ffffff;
+  
+  /* Support Colors - Keep for status indicators */
+  --cds-support-01: #da1e28;
+  --cds-support-02: #24a148;
+  --cds-support-03: #f1c21b;
+  --cds-support-04: #525252;
+  
+  /* Additional Neutral Colors - Black & White */
+  --hamza-accent: #000000;
+  --hamza-accent-hover: #262626;
+  --hamza-accent-active: #000000;
+  --hamza-gray-10: #f4f4f4;
+  --hamza-gray-20: #e0e0e0;
+  --hamza-gray-50: #8d8d8d;
+  --hamza-gray-70: #525252;
+  --hamza-gray-90: #262626;
+  --hamza-gray-100: #000000;
+  --hamza-white: #ffffff;
+  --hamza-cool-gray-10: #f4f4f4;
+  --hamza-cool-gray-20: #e0e0e0;
+  --hamza-purple-60: #525252;
+  --hamza-teal-60: #525252;
+  --hamza-green-60: #24a148;
+  --hamza-red-60: #da1e28;
+  --hamza-orange-60: #ff832b;
+  --hamza-yellow-60: #f1c21b;
+  
+  /* Border Colors */
+  --wm-border-subtle: #262626;
+  --wm-border-strong: #525252;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Hamza Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: var(--wm-content-bg);
+  color: var(--cds-text-01);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+
+code {
+  font-family: 'Hamza Plex Mono', source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* Custom Carbon Component Overrides - Black & White Theme */
+.cds--header {
+  background-color: var(--wm-dark-header);
+  border-bottom: 1px solid var(--wm-border-subtle);
+}
+
+.cds--header__name {
+  color: var(--cds-text-inverse);
+}
+
+/* Tile Enhancements */
+.cds--tile {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background-color: var(--hamza-white);
+  border: 1px solid var(--hamza-gray-20);
+}
+
+.cds--tile:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.cds--tile--clickable:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  border-color: var(--hamza-gray-90);
+}
+
+/* Button Enhancements - Black & White Theme */
+.cds--btn--primary {
+  background-color: #000000;
+  border: none;
+  color: #ffffff;
+}
+
+.cds--btn--primary:hover {
+  background-color: #262626;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+.cds--btn--primary:active {
+  transform: translateY(0);
+  background-color: #000000;
+}
+
+/* Data Table Enhancements */
+.cds--data-table {
+  background-color: var(--hamza-white);
+}
+
+.cds--data-table thead {
+  background-color: var(--hamza-gray-10);
+  border-bottom: 1px solid var(--hamza-gray-20);
+}
+
+.cds--data-table th {
+  font-weight: 600;
+  font-size: 0.875rem;
+  color: var(--cds-text-01);
+}
+
+.cds--data-table tbody tr {
+  border-bottom: 1px solid var(--hamza-gray-20);
+}
+
+.cds--data-table tbody tr:hover {
+  background-color: var(--hamza-gray-10);
+}
+
+/* Tag Enhancements */
+.cds--tag {
+  border-radius: 6px;
+  font-weight: 500;
+}
+
+/* Modal Enhancements */
+.cds--modal-container {
+  border-radius: 0;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.15);
+}
+
+.cds--modal-header {
+  background-color: var(--hamza-gray-10);
+  border-bottom: 1px solid var(--hamza-gray-20);
+}
+
+.cds--modal-header__heading {
+  font-weight: 400;
+  font-size: 1.25rem;
+}
+
+/* Loading Spinner */
+.cds--loading__stroke {
+  stroke: #000000;
+}
+
+/* Notification Enhancements */
+.cds--inline-notification {
+  border-radius: 0;
+  border-left-width: 3px;
+}
+
+.cds--inline-notification--info {
+  background-color: #f4f4f4;
+  border-left-color: #000000;
+}
+
+.cds--inline-notification--success {
+  background-color: #e8f5e9;
+  border-left-color: var(--hamza-green-60);
+}
+
+.cds--inline-notification--warning {
+  background-color: #fff4e6;
+  border-left-color: var(--hamza-orange-60);
+}
+
+.cds--inline-notification--error {
+  background-color: #ffebee;
+  border-left-color: var(--hamza-red-60);
+}
+
+/* Progress Bar */
+.cds--progress-bar__bar {
+  background: linear-gradient(90deg, #000000 0%, #262626 100%);
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--hamza-gray-10);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--hamza-gray-50);
+  border-radius: 4px;
+  transition: background 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--hamza-gray-70);
+
+/* Custom Layout Classes */
+.page-container {
+  padding: 2rem;
+  max-width: 100%;
+  margin: 0;
+  background-color: transparent;
+  min-height: calc(100vh - 48px);
+}
+
+/* Ensure all page content has consistent background */
+.cds--content > div {
+  background-color: transparent;
+}
+}
+
+/* Custom Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.shimmer {
+  animation: shimmer 2s infinite linear;
+  background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+  background-size: 1000px 100%;
+}
+
+/* Custom Layout Classes */
+.page-container {
+  padding: 0;
+  max-width: 100%;
+  margin: 0;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+/* Utility Classes */
+.text-center {
+  text-align: center;
+}
+
+.mt-1 { margin-top: 0.5rem; }
+.mt-2 { margin-top: 1rem; }
+.mt-3 { margin-top: 1.5rem; }
+.mt-4 { margin-top: 2rem; }
+
+.mb-1 { margin-bottom: 0.5rem; }
+.mb-2 { margin-bottom: 1rem; }
+.mb-3 { margin-bottom: 1.5rem; }
+.mb-4 { margin-bottom: 2rem; }
+
+.p-1 { padding: 0.5rem; }
+.p-2 { padding: 1rem; }
+.p-3 { padding: 1.5rem; }
+.p-4 { padding: 2rem; }
+
+/* Made with Bob */
