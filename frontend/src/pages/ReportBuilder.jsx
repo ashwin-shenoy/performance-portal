@@ -13,6 +13,7 @@ const ReportBuilder = () => {
   const [generating, setGenerating] = useState(false);
   const [includeBaseline, setIncludeBaseline] = useState(false);
   const [includePdf, setIncludePdf] = useState(false);
+  const [includeRegression, setIncludeRegression] = useState(false);
 
   const [formData, setFormData] = useState({
     // Basic Information
@@ -165,7 +166,9 @@ const ReportBuilder = () => {
       const endpoint = includePdf
         ? `/api/v1/reports/generate/jmeter/${testRunId}/both`
         : `/api/v1/reports/generate/jmeter/${testRunId}`;
-      const response = await axios.post(endpoint, null, { params: { includeBaseline } });
+      const response = await axios.post(endpoint, null, {
+        params: { includeBaseline, includeRegression },
+      });
       
       if (response.data.success) {
         alert('Report generated successfully!');
@@ -512,6 +515,14 @@ const ReportBuilder = () => {
               onChange={(e) => setIncludeBaseline(e.target.checked)}
             />
             Compare to baseline
+          </label>
+          <label className="baseline-toggle">
+            <input
+              type="checkbox"
+              checked={includeRegression}
+              onChange={(e) => setIncludeRegression(e.target.checked)}
+            />
+            Compare to previous build
           </label>
           <label className="baseline-toggle">
             <input

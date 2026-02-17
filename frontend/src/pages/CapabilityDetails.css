@@ -95,6 +95,10 @@
   padding: 1.5rem;
 }
 
+.capability-document-data {
+  padding: 1.5rem;
+}
+
 .capability-architecture {
   padding: 1.5rem;
 }
@@ -169,6 +173,54 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 1rem;
+}
+
+.document-data-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+}
+
+.document-data-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.document-scenarios {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: #f9f9f9;
+}
+
+.document-scenarios-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.document-scenarios-header h4 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 500;
+}
+
+.document-scenario {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.75rem;
+  align-items: end;
+}
+
+@media (max-width: 720px) {
+  .document-scenario {
+    grid-template-columns: 1fr;
+  }
 }
 
 .testcase-controls {

@@ -124,6 +124,20 @@ java -jar target/performance-portal-1.0.0.jar \
   --server.port=8080
 ```
 
+## Docker Compose Deployment
+
+From the repo root:
+
+```bash
+./deploy/docker/deploy.sh
+```
+
+To stop the stack:
+
+```bash
+./deploy/docker/undeploy.sh
+```
+
 ## API Endpoints
 
 ### Authentication

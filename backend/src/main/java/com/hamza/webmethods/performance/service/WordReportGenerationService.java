@@ -9,6 +9,7 @@ import org.apache.poi.util.Units;
 import org.apache.poi.wp.usermodel.HeaderFooterType;
 import org.apache.poi.xwpf.usermodel.*;
 import org.apache.poi.xwpf.usermodel.ParagraphAlignment;
+import org.apache.xmlbeans.XmlCursor;
 import org.openxmlformats.schemas.wordprocessingml.x2006.main.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ClassPathResource;
@@ -94,7 +95,7 @@ public class WordReportGenerationService {
     // ========================================================================
 
     @Transactional
-    public Report generateWordReport(Long testRunId, String generatedBy, boolean includeBaseline) throws Exception {
+    public Report generateWordReport(Long testRunId, String generatedBy, boolean includeBaseline, boolean includeRegression) throws Exception {
         log.info("Generating Word report for test run ID: {}", testRunId);
 
         TestRun testRun = testRunRepository.findById(testRunId)
@@ -172,7 +173,7 @@ public class WordReportGenerationService {
         }
 
         // 11. Conclusion & Recommendations
-        addConclusionSection(document, testRun);
+        addConclusionSection(document, testRun, includeRegression);
 
         // Save document
         String timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd_HHmmss"));
@@ -201,9 +202,9 @@ public class WordReportGenerationService {
     }
 
     @Transactional
-    public Report generatePdfReport(Long testRunId, String generatedBy, boolean includeBaseline) throws Exception {
+    public Report generatePdfReport(Long testRunId, String generatedBy, boolean includeBaseline, boolean includeRegression) throws Exception {
         log.info("Generating PDF report for test run ID: {}", testRunId);
-        Report wordReport = generateWordReport(testRunId, generatedBy, includeBaseline);
+        Report wordReport = generateWordReport(testRunId, generatedBy, includeBaseline, includeRegression);
         String pdfFilePath = pdfConversionService.generatePdfFilePath(wordReport.getFilePath());
         boolean success = pdfConversionService.convertDocxToPdf(wordReport.getFilePath(), pdfFilePath);
         if (!success) {
@@ -223,8 +224,8 @@ public class WordReportGenerationService {
     }
 
     @Transactional
-    public Report generateBothReports(Long testRunId, String generatedBy, boolean includeBaseline) throws Exception {
-        Report wordReport = generateWordReport(testRunId, generatedBy, includeBaseline);
+    public Report generateBothReports(Long testRunId, String generatedBy, boolean includeBaseline, boolean includeRegression) throws Exception {
+        Report wordReport = generateWordReport(testRunId, generatedBy, includeBaseline, includeRegression);
         String pdfFilePath = pdfConversionService.generatePdfFilePath(wordReport.getFilePath());
         boolean success = pdfConversionService.convertDocxToPdf(wordReport.getFilePath(), pdfFilePath);
         if (!success) {
@@ -440,75 +441,43 @@ public class WordReportGenerationService {
 
     private void addCoverPageTitle(XWPFDocument document, Capability capability, TestRun testRun) {
         try {
-            // Get all paragraphs
-            List<XWPFParagraph> paragraphs = document.getParagraphs();
-            if (paragraphs.isEmpty()) {
-                log.warn("No paragraphs in document for cover page");
-                return;
-            }
+            XmlCursor coverCursor = getCoverInsertCursor(document);
+            String capabilityName = capability.getName() != null ? capability.getName() : "";
+            String reportTitle = "Performance Test Report " + capabilityName;
 
-            // Modify the first paragraph to contain the capability title
-            XWPFParagraph titlePara = paragraphs.get(0);
-            titlePara.setAlignment(ParagraphAlignment.CENTER);
-            titlePara.getRuns().clear(); // Clear any existing content
-            
+                LocalDateTime coverDate = testRun.getTestDate();
+                if (coverDate == null && testRun.getCreatedAt() != null) {
+                    coverDate = testRun.getCreatedAt();
+                }
+                String formattedDate = coverDate != null
+                    ? coverDate.format(DateTimeFormatter.ofPattern("dd MMM yyyy"))
+                    : "N/A";
+            String buildNumber = testRun.getBuildNumber() != null && !testRun.getBuildNumber().isBlank()
+                    ? testRun.getBuildNumber()
+                    : "N/A";
+
+            XWPFParagraph titlePara = document.insertNewParagraph(coverCursor);
+            titlePara.setAlignment(ParagraphAlignment.LEFT);
             XWPFRun titleRun = titlePara.createRun();
-            titleRun.setText(capability.getName() + " Performance Test Report");
+            titleRun.setText(reportTitle.trim());
             titleRun.setBold(true);
-            titleRun.setFontSize(26);
+            titleRun.setFontSize(30);
             titleRun.setFontFamily(FONT_FAMILY);
             titleRun.setColor("1F4E78");
 
-            // Add spacer paragraph
-            XWPFParagraph spacer = document.createParagraph();
-            spacer.setAlignment(ParagraphAlignment.CENTER);
-            spacer.createRun().setText("");
+            titleRun.addBreak();
+            XWPFRun dateRun = titlePara.createRun();
+            dateRun.setText(formattedDate);
+            dateRun.setFontSize(12);
+            dateRun.setFontFamily(FONT_FAMILY);
+            dateRun.setColor("333333");
 
-            // Add test name paragraph
-            XWPFParagraph testNamePara = document.createParagraph();
-            testNamePara.setAlignment(ParagraphAlignment.CENTER);
-            XWPFRun testNameRun = testNamePara.createRun();
-            testNameRun.setText(testRun.getTestName());
-            testNameRun.setFontSize(12);
-            testNameRun.setFontFamily(FONT_FAMILY);
-            testNameRun.setColor("333333");
-
-            // Add capability description if present
-            if (capability.getDescription() != null && !capability.getDescription().isBlank()) {
-                XWPFParagraph descPara = document.createParagraph();
-                descPara.setAlignment(ParagraphAlignment.CENTER);
-                XWPFRun descRun = descPara.createRun();
-                descRun.setText(capability.getDescription());
-                descRun.setFontSize(11);
-                descRun.setFontFamily(FONT_FAMILY);
-                descRun.setColor("555555");
-                descRun.setItalic(true);
-            }
-
-            // Add a spacer
-            XWPFParagraph infoSpacer = document.createParagraph();
-            infoSpacer.setAlignment(ParagraphAlignment.LEFT);
-            infoSpacer.createRun().setText("");
-
-            // Add capability detail lines
-            addCoverDetailLine(document, "Capability", capability.getName());
-            addCoverDetailLine(document, "Test Name", testRun.getTestName());
-            addCoverDetailLine(document, "Test Date",
-                    testRun.getTestDate() != null
-                            ? testRun.getTestDate().format(DateTimeFormatter.ofPattern("MMMM dd, yyyy"))
-                            : "N/A");
-            if (testRun.getBuildNumber() != null && !testRun.getBuildNumber().isBlank()) {
-                addCoverDetailLine(document, "Build Number", testRun.getBuildNumber());
-            }
-            if (capability.getTestObjective() != null && !capability.getTestObjective().isBlank()) {
-                addCoverDetailLine(document, "Test Objective", capability.getTestObjective());
-            }
-            if (capability.getTestScope() != null && !capability.getTestScope().isBlank()) {
-                addCoverDetailLine(document, "Test Scope", capability.getTestScope());
-            }
-            if (capability.getEnvironmentDetails() != null && !capability.getEnvironmentDetails().isBlank()) {
-                addCoverDetailLine(document, "Environment", capability.getEnvironmentDetails());
-            }
+            dateRun.addBreak();
+            XWPFRun buildRun = titlePara.createRun();
+            buildRun.setText("Build: " + buildNumber);
+            buildRun.setFontSize(12);
+            buildRun.setFontFamily(FONT_FAMILY);
+            buildRun.setColor("333333");
 
             log.info("Cover page title added: {}", capability.getName());
         } catch (Exception e) {
@@ -516,24 +485,28 @@ public class WordReportGenerationService {
         }
     }
 
-    private void addCoverDetailLine(XWPFDocument document, String label, String value) {
-        XWPFParagraph para = document.createParagraph();
-        para.setAlignment(ParagraphAlignment.LEFT);
-        applyStyle(para, STYLE_NORMAL);
-
-        XWPFRun labelRun = para.createRun();
-        labelRun.setText(label + ": ");
-        labelRun.setBold(true);
-        labelRun.setFontSize(11);
-        labelRun.setFontFamily(FONT_FAMILY);
-        labelRun.setColor("333333");
-
-        XWPFRun valueRun = para.createRun();
-        valueRun.setText(value != null && !value.isBlank() ? value : "N/A");
-        valueRun.setFontSize(11);
-        valueRun.setFontFamily(FONT_FAMILY);
-        valueRun.setColor("333333");
+    private XmlCursor getCoverInsertCursor(XWPFDocument document) {
+        List<IBodyElement> elements = document.getBodyElements();
+        for (IBodyElement element : elements) {
+            if (element instanceof XWPFParagraph paragraph) {
+                CTP ctP = paragraph.getCTP();
+                if (ctP != null && ctP.isSetPPr() && ctP.getPPr().isSetSectPr()) {
+                    return ctP.newCursor();
+                }
+            }
+        }
+        if (!document.getParagraphs().isEmpty()) {
+            return document.getParagraphs().get(0).getCTP().newCursor();
+        }
+        return document.getDocument().getBody().newCursor();
     }
+
+    private void insertSpacerParagraph(XWPFDocument document, XmlCursor cursor, ParagraphAlignment alignment) {
+        XWPFParagraph spacer = document.insertNewParagraph(cursor);
+        spacer.setAlignment(alignment);
+        spacer.createRun().setText("");
+    }
+
 
     // ========================================================================
     // 1. EXECUTIVE SUMMARY (dynamic SLA verdict)
@@ -556,7 +529,7 @@ public class WordReportGenerationService {
 
         // KPI Summary table (Hamza template style: header + data rows, TableGrid)
         XWPFTable kpiTable = document.createTable(4, 4);
-        kpiTable.setWidth("100%");
+        setFixedTableLayout(kpiTable, 4);
         applyTableStyle(kpiTable, "TableGrid");
         preventRowSplitting(kpiTable);
         // Row 0: headers
@@ -646,6 +619,9 @@ public class WordReportGenerationService {
         if (hasObjective) {
             addHeading2(document, "Test Objective");
             addBodyParagraph(document, capability.getTestObjective());
+            if (hasScope) {
+                addEmptyLine(document);
+            }
         }
 
         if (hasScope) {
@@ -747,7 +723,7 @@ public class WordReportGenerationService {
 
         String[] headers = {"#", "Test Case", "Description", "Expected Behavior", "Priority"};
         XWPFTable table = document.createTable(testCases.size() + 1, headers.length);
-        table.setWidth("100%");
+        setFixedTableLayout(table, headers.length);
         preventRowSplitting(table);
 
         XWPFTableRow headerRow = table.getRow(0);
@@ -793,7 +769,7 @@ public class WordReportGenerationService {
         };
 
         XWPFTable table = document.createTable(data.length, 2);
-        table.setWidth("100%");
+        setFixedTableLayout(table, 2);
         preventRowSplitting(table);
         for (int i = 0; i < data.length; i++) {
             XWPFTableRow row = table.getRow(i);
@@ -834,7 +810,7 @@ public class WordReportGenerationService {
         };
 
         XWPFTable table = document.createTable(data.length + 1, 2);
-        table.setWidth("100%");
+        setFixedTableLayout(table, 2);
         preventRowSplitting(table);
         styleHeaderCell(table.getRow(0).getCell(0), "Metric");
         styleHeaderCell(table.getRow(0).getCell(1), "Value");
@@ -891,7 +867,7 @@ public class WordReportGenerationService {
                 "Max (ms)", "P90 (ms)", "P95 (ms)", "P99 (ms)", "Throughput"};
 
         XWPFTable table = document.createTable(filteredLabelStats.size() + 1, headers.length);
-        table.setWidth("100%");
+        setFixedTableLayout(table, headers.length);
         preventRowSplitting(table);
 
         XWPFTableRow headerRow = table.getRow(0);
@@ -954,7 +930,7 @@ public class WordReportGenerationService {
 
         String[] headers = {"#", "Metric", "Operator", "Threshold", "Unit"};
         XWPFTable table = document.createTable(criteria.size() + 1, headers.length);
-        table.setWidth("100%");
+        setFixedTableLayout(table, headers.length);
         preventRowSplitting(table);
         preventRowSplitting(table);
 
@@ -1005,7 +981,7 @@ public class WordReportGenerationService {
 
             String[] headers = {"Metric", "SLA Threshold", "Actual Value", "Result"};
             XWPFTable table = document.createTable(2, headers.length);
-            table.setWidth("100%");
+            setFixedTableLayout(table, headers.length);
             preventRowSplitting(table);
             XWPFTableRow headerRow = table.getRow(0);
             for (int c = 0; c < headers.length; c++) { styleHeaderCell(headerRow.getCell(c), headers[c]); }
@@ -1027,7 +1003,7 @@ public class WordReportGenerationService {
 
         String[] headers = {"Metric", "SLA Threshold", "Actual Value", "Result"};
         XWPFTable table = document.createTable(criteria.size() + 1, headers.length);
-        table.setWidth("100%");
+        setFixedTableLayout(table, headers.length);
 
         XWPFTableRow headerRow = table.getRow(0);
         for (int c = 0; c < headers.length; c++) { styleHeaderCell(headerRow.getCell(c), headers[c]); }
@@ -1118,7 +1094,7 @@ public class WordReportGenerationService {
         };
 
         XWPFTable baselineTable = document.createTable(baselineRows.length + 1, 2);
-        baselineTable.setWidth("100%");
+        setFixedTableLayout(baselineTable, 2);
         preventRowSplitting(baselineTable);
         styleHeaderCell(baselineTable.getRow(0).getCell(0), "Metric");
         styleHeaderCell(baselineTable.getRow(0).getCell(1), "Threshold");
@@ -1146,7 +1122,7 @@ public class WordReportGenerationService {
 
         String[] headers = {"Label", "P90 (ms)", "P95 (ms)", "Avg (ms)", "Throughput", "Result"};
         XWPFTable table = document.createTable(filteredResults.size() + 1, headers.length);
-        table.setWidth("100%");
+        setFixedTableLayout(table, headers.length);
         preventRowSplitting(table);
 
         XWPFTableRow headerRow = table.getRow(0);
@@ -1276,7 +1252,7 @@ public class WordReportGenerationService {
     // ========================================================================
 
     @SuppressWarnings("unchecked")
-    private void addConclusionSection(XWPFDocument document, TestRun testRun) {
+    private void addConclusionSection(XWPFDocument document, TestRun testRun, boolean includeRegression) {
         addHeading1(document, "Conclusion & Recommendations");
 
         Capability capability = testRun.getCapability();
@@ -1307,14 +1283,59 @@ public class WordReportGenerationService {
         for (String f : findings) { addBulletItem(document, f); }
         addEmptyLine(document);
 
+        addHeading2(document, "Automated Checks");
+        List<String> checks = new ArrayList<>();
+
+        SlaEvaluationResult slaResult = evaluateAllCriteria(testRun);
+        if (slaResult.totalCriteria > 0) {
+            checks.add(String.format("SLA summary: %s (%d of %d criteria met).",
+                    slaResult.allPassed ? "PASS" : "FAIL",
+                    slaResult.totalCriteria - slaResult.failedCriteria,
+                    slaResult.totalCriteria));
+        }
+
+        List<String> latencyAlerts = getLatencyAlerts(testRun);
+        if (latencyAlerts.isEmpty()) {
+            checks.add("Latency distribution: within expected range.");
+        } else {
+            checks.addAll(latencyAlerts);
+        }
+
+        BaselineSummary baselineSummary = getBaselineSummary(testRun);
+        if (baselineSummary.hasBaseline) {
+            if (baselineSummary.failedLabels.isEmpty()) {
+                checks.add("Baseline variance: all labels within thresholds.");
+            } else {
+                checks.add(String.format("Baseline variance: %d labels failed (%s).",
+                        baselineSummary.failedLabels.size(),
+                        String.join(", ", baselineSummary.failedLabels)));
+            }
+        }
+
+        if (includeRegression) {
+            RegressionSummary regressionSummary = getRegressionSummary(testRun);
+            if (regressionSummary.hasPrevious) {
+                if (regressionSummary.issues.isEmpty()) {
+                    checks.add(String.format("Regression check: no regressions vs test run #%d.",
+                            regressionSummary.previousRunId));
+                } else {
+                    checks.add(String.format("Regression check vs test run #%d: %s",
+                            regressionSummary.previousRunId, String.join("; ", regressionSummary.issues)));
+                }
+            }
+        }
+
+        for (String check : checks) { addBulletItem(document, check); }
+        addEmptyLine(document);
+
         addHeading2(document, "Recommendations");
         List<String> recs = new ArrayList<>();
 
         if (hasCriteria) {
-            SlaEvaluationResult slaResult = evaluateAllCriteria(testRun);
-            if (!slaResult.allPassed) {
+            SlaEvaluationResult recSlaResult = evaluateAllCriteria(testRun);
+            if (!recSlaResult.allPassed) {
                 recs.add("Investigate and remediate SLA violations identified in the Results vs Acceptance Criteria section.");
-                for (String failedMetric : slaResult.failedMetrics) {
+                for (String failedMetric : recSlaResult.failedMetrics) {
                     recs.add(String.format("Review %s — exceeded the defined SLA threshold.", getMetricDisplayName(failedMetric)));
                 }
             }
@@ -1496,6 +1517,122 @@ public class WordReportGenerationService {
         return label.trim().toLowerCase();
     }
 
+    private List<String> getLatencyAlerts(TestRun testRun) {
+        List<String> alerts = new ArrayList<>();
+        Double p99 = testRun.getPercentile99();
+        Double p95 = testRun.getPercentile95();
+        Double avg = testRun.getAvgResponseTime();
+
+        if (p99 != null && p95 != null && p99 > p95 * 2) {
+            alerts.add(String.format("Latency distribution alert: P99 (%s) is > 2x P95 (%s).",
+                    formatMs(p99), formatMs(p95)));
+        }
+        if (p99 != null && avg != null && p99 > avg * 5) {
+            alerts.add(String.format("Latency distribution alert: P99 (%s) is > 5x Avg (%s).",
+                    formatMs(p99), formatMs(avg)));
+        }
+        return alerts;
+    }
+
+    private BaselineSummary getBaselineSummary(TestRun testRun) {
+        Map<String, Object> capData = testRun.getCapabilitySpecificData();
+        if (capData == null || !capData.containsKey("baselineEvaluation")) {
+            return new BaselineSummary(false, List.of());
+        }
+
+        Object baselineEvalObj = capData.get("baselineEvaluation");
+        if (!(baselineEvalObj instanceof Map)) {
+            return new BaselineSummary(false, List.of());
+        }
+
+        Map<String, Object> baselineEval = (Map<String, Object>) baselineEvalObj;
+        Map<String, Object> results = baselineEval.get("results") instanceof Map
+                ? (Map<String, Object>) baselineEval.get("results")
+                : new HashMap<>();
+
+        Map<String, Object> filteredResults = filterLabelsToTestCases(results, testRun.getCapability());
+        List<String> failedLabels = new ArrayList<>();
+        for (Map.Entry<String, Object> entry : filteredResults.entrySet()) {
+            if (entry.getValue() instanceof Map eval && Boolean.FALSE.equals(eval.get("pass"))) {
+                failedLabels.add(entry.getKey());
+            }
+        }
+
+        List<String> trimmed = failedLabels.size() > 5
+                ? failedLabels.subList(0, 5)
+                : failedLabels;
+        return new BaselineSummary(true, trimmed);
+    }
+
+    private RegressionSummary getRegressionSummary(TestRun testRun) {
+        List<TestRun> runs = testRunRepository.findLatestByCapabilityId(testRun.getCapability().getId());
+        TestRun previous = null;
+        for (TestRun run : runs) {
+            if (!run.getId().equals(testRun.getId())) {
+                previous = run;
+                break;
+            }
+        }
+
+        if (previous == null) {
+            return new RegressionSummary(false, null, List.of());
+        }
+
+        List<String> issues = new ArrayList<>();
+        Double avg = testRun.getAvgResponseTime();
+        Double prevAvg = previous.getAvgResponseTime();
+        Double p95 = testRun.getPercentile95();
+        Double prevP95 = previous.getPercentile95();
+        Double throughput = testRun.getThroughput();
+        Double prevThroughput = previous.getThroughput();
+        Double errorRate = testRun.getErrorRate();
+        Double prevErrorRate = previous.getErrorRate();
+
+        if (avg != null && prevAvg != null && avg > prevAvg * 1.10) {
+            issues.add(String.format("Avg latency +%.1f%%", percentChange(avg, prevAvg)));
+        }
+        if (p95 != null && prevP95 != null && p95 > prevP95 * 1.10) {
+            issues.add(String.format("P95 latency +%.1f%%", percentChange(p95, prevP95)));
+        }
+        if (throughput != null && prevThroughput != null && throughput < prevThroughput * 0.90) {
+            issues.add(String.format("Throughput -%.1f%%", percentChange(prevThroughput, throughput)));
+        }
+        if (errorRate != null && prevErrorRate != null && errorRate - prevErrorRate > 0.5) {
+            issues.add(String.format("Error rate +%.2f%%", errorRate - prevErrorRate));
+        }
+
+        return new RegressionSummary(true, previous.getId(), issues);
+    }
+
+    private double percentChange(double current, double baseline) {
+        if (baseline == 0) {
+            return 0.0;
+        }
+        return ((current - baseline) / baseline) * 100.0;
+    }
+
+    private static class BaselineSummary {
+        private final boolean hasBaseline;
+        private final List<String> failedLabels;
+
+        private BaselineSummary(boolean hasBaseline, List<String> failedLabels) {
+            this.hasBaseline = hasBaseline;
+            this.failedLabels = failedLabels;
+        }
+    }
+
+    private static class RegressionSummary {
+        private final boolean hasPrevious;
+        private final Long previousRunId;
+        private final List<String> issues;
+
+        private RegressionSummary(boolean hasPrevious, Long previousRunId, List<String> issues) {
+            this.hasPrevious = hasPrevious;
+            this.previousRunId = previousRunId;
+            this.issues = issues;
+        }
+    }
+
     private static class SlaEvaluationResult {
         boolean allPassed = true;
         int totalCriteria = 0;
@@ -1629,12 +1766,53 @@ public class WordReportGenerationService {
         }
     }
 
+    private void applyTableBorders(XWPFTable table, String color, int size) {
+        CTTblPr tblPr = table.getCTTbl().getTblPr() != null
+            ? table.getCTTbl().getTblPr()
+            : table.getCTTbl().addNewTblPr();
+        CTTblBorders borders = tblPr.isSetTblBorders()
+                ? tblPr.getTblBorders()
+                : tblPr.addNewTblBorders();
+
+        setBorder(borders.isSetTop() ? borders.getTop() : borders.addNewTop(), color, size);
+        setBorder(borders.isSetBottom() ? borders.getBottom() : borders.addNewBottom(), color, size);
+        setBorder(borders.isSetLeft() ? borders.getLeft() : borders.addNewLeft(), color, size);
+        setBorder(borders.isSetRight() ? borders.getRight() : borders.addNewRight(), color, size);
+        setBorder(borders.isSetInsideH() ? borders.getInsideH() : borders.addNewInsideH(), color, size);
+        setBorder(borders.isSetInsideV() ? borders.getInsideV() : borders.addNewInsideV(), color, size);
+    }
+
+    private void setBorder(CTBorder border, String color, int size) {
+        border.setVal(STBorder.SINGLE);
+        border.setColor(color);
+        border.setSz(BigInteger.valueOf(size));
+        border.setSpace(BigInteger.ZERO);
+    }
+
     private void preventRowSplitting(XWPFTable table) {
         for (XWPFTableRow row : table.getRows()) {
             CTTrPr trPr = row.getCtRow().isSetTrPr()
                 ? row.getCtRow().getTrPr()
                 : row.getCtRow().addNewTrPr();
             trPr.addNewCantSplit();
+        }
+    }
+
+    private void setFixedTableLayout(XWPFTable table, int columnCount) {
+        int safeColumns = Math.max(1, columnCount);
+        int tableWidth = 9000;
+        int colWidth = tableWidth / safeColumns;
+        table.setWidthType(TableWidthType.DXA);
+        table.setWidth(String.valueOf(tableWidth));
+
+        applyTableBorders(table, "000000", 8);
+
+        CTTblGrid grid = table.getCTTbl().getTblGrid() != null
+            ? table.getCTTbl().getTblGrid()
+            : table.getCTTbl().addNewTblGrid();
+        grid.getGridColList().clear();
+        for (int i = 0; i < safeColumns; i++) {
+            grid.addNewGridCol().setW(BigInteger.valueOf(colWidth));
         }
     }
 

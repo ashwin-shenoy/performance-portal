@@ -56,6 +56,9 @@ export const API_ENDPOINTS = {
   REPORTS_BY_TEST_RUN: (testRunId) => `/api/v1/reports/test-run/${testRunId}`,
   REPORTS_LIST: '/api/v1/reports/list',
   DELETE_REPORT: (id) => `/api/v1/reports/${id}`,
+
+  // Document Data
+  DOCUMENT_DATA: (testRunId) => `/api/v1/test-runs/${testRunId}/document-data`,
   
   // Analytics
   ANALYTICS_SUMMARY: '/api/v1/analytics/summary',

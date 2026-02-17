@@ -343,13 +343,14 @@ public class ReportController {
     public ResponseEntity<Map<String, Object>> generateJMeterReport(
             @PathVariable Long testRunId,
             @RequestParam(value = "includeBaseline", defaultValue = "false") boolean includeBaseline,
+            @RequestParam(value = "includeRegression", defaultValue = "false") boolean includeRegression,
             Authentication authentication) {
         
         log.info("Generating JMeter Word report for test run ID: {}", testRunId);
         
         try {
             String generatedBy = authentication != null ? authentication.getName() : "system";
-            Report report = wordReportGenerationService.generateWordReport(testRunId, generatedBy, includeBaseline);
+            Report report = wordReportGenerationService.generateWordReport(testRunId, generatedBy, includeBaseline, includeRegression);
             
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
@@ -407,11 +408,12 @@ public class ReportController {
     public ResponseEntity<Map<String, Object>> generateJMeterPdfReport(
             @PathVariable Long testRunId,
             @RequestParam(value = "includeBaseline", defaultValue = "false") boolean includeBaseline,
+            @RequestParam(value = "includeRegression", defaultValue = "false") boolean includeRegression,
             Authentication authentication) {
         
         try {
             String generatedBy = authentication != null ? authentication.getName() : "system";
-            Report report = wordReportGenerationService.generatePdfReport(testRunId, generatedBy, includeBaseline);
+            Report report = wordReportGenerationService.generatePdfReport(testRunId, generatedBy, includeBaseline, includeRegression);
             
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);
@@ -437,11 +439,12 @@ public class ReportController {
     public ResponseEntity<Map<String, Object>> generateJMeterBothReports(
             @PathVariable Long testRunId,
             @RequestParam(value = "includeBaseline", defaultValue = "false") boolean includeBaseline,
+            @RequestParam(value = "includeRegression", defaultValue = "false") boolean includeRegression,
             Authentication authentication) {
         
         try {
             String generatedBy = authentication != null ? authentication.getName() : "system";
-            Report pdfReport = wordReportGenerationService.generateBothReports(testRunId, generatedBy, includeBaseline);
+            Report pdfReport = wordReportGenerationService.generateBothReports(testRunId, generatedBy, includeBaseline, includeRegression);
             
             Map<String, Object> response = new HashMap<>();
             response.put("success", true);

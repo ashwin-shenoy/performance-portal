@@ -81,6 +81,22 @@ const CapabilityDetails = () => {
   const [architectureFile, setArchitectureFile] = useState(null);
   const [architectureSaving, setArchitectureSaving] = useState(false);
   const [architectureRemoving, setArchitectureRemoving] = useState(false);
+  const [documentRunId, setDocumentRunId] = useState('');
+  const [documentLoading, setDocumentLoading] = useState(false);
+  const [documentSaving, setDocumentSaving] = useState(false);
+  const [documentForm, setDocumentForm] = useState({
+    capabilityName: '',
+    description: '',
+    introduction: '',
+    benchmarkGoals: '',
+    testSetup: '',
+    hardwareInfo: '',
+    scenarioFields: [''],
+    performanceAnalysis: '',
+    capacityPlanning: '',
+    conclusions: '',
+    additionalNotes: '',
+  });
 
   useEffect(() => {
     fetchTestRuns();
@@ -129,6 +145,15 @@ const CapabilityDetails = () => {
       setTestCases([]);
     }
   }, [selectedCapabilityId]);
+
+  useEffect(() => {
+    if (!documentRunId) {
+      resetDocumentForm();
+      return;
+    }
+
+    fetchDocumentData(documentRunId);
+  }, [documentRunId]);
 
   const refreshAll = () => {
     fetchTestRuns();
@@ -322,6 +347,51 @@ const CapabilityDetails = () => {
     setTestCaseTouched(false);
   };
 
+  const resetDocumentForm = () => {
+    setDocumentForm({
+      capabilityName: '',
+      description: '',
+      introduction: '',
+      benchmarkGoals: '',
+      testSetup: '',
+      hardwareInfo: '',
+      scenarioFields: [''],
+      performanceAnalysis: '',
+      capacityPlanning: '',
+      conclusions: '',
+      additionalNotes: '',
+    });
+  };
+
+  const formatLines = (value) => {
+    if (!Array.isArray(value)) {
+      return '';
+    }
+    return value.join('\n');
+  };
+
+  const parseLines = (value) => {
+    if (value === null || value === undefined) {
+      return [];
+    }
+    return String(value)
+      .split('\n')
+      .map((line) => line.trim())
+      .filter(Boolean);
+  };
+
+  const normalizeScenarioFields = (docData) => {
+    const scenarios = [];
+    for (let i = 1; i <= 10; i += 1) {
+      const field = docData?.[`scenario${i}`];
+      const formatted = formatLines(field);
+      if (formatted) {
+        scenarios.push(formatted);
+      }
+    }
+    return scenarios.length > 0 ? scenarios : [''];
+  };
+
   const openCreateTestCase = () => {
     resetTestCaseForm();
     setTestCaseModalOpen(true);
@@ -360,6 +430,36 @@ const CapabilityDetails = () => {
     }));
   };
 
+  const handleDocumentChange = (field, value) => {
+    setDocumentForm((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const handleScenarioChange = (index, value) => {
+    setDocumentForm((prev) => ({
+      ...prev,
+      scenarioFields: prev.scenarioFields.map((item, i) => (i === index ? value : item)),
+    }));
+  };
+
+  const addScenarioField = () => {
+    setDocumentForm((prev) => {
+      if (prev.scenarioFields.length >= 10) {
+        return prev;
+      }
+      return { ...prev, scenarioFields: [...prev.scenarioFields, ''] };
+    });
+  };
+
+  const removeScenarioField = (index) => {
+    setDocumentForm((prev) => {
+      const next = prev.scenarioFields.filter((_, i) => i !== index);
+      return { ...prev, scenarioFields: next.length ? next : [''] };
+    });
+  };
+
   const parseBaselineNumber = (value) => {
     if (value === null || value === undefined) {
       return null;
@@ -370,6 +470,47 @@ const CapabilityDetails = () => {
     }
     const numeric = Number(normalized);
     return Number.isFinite(numeric) ? numeric : null;
+  };
+
+  const fetchDocumentData = async (testRunId) => {
+    setDocumentLoading(true);
+    try {
+      const response = await axios.get(API_ENDPOINTS.TEST_BY_ID(testRunId));
+      const testRun = response.data || {};
+      let docData = {};
+
+      if (testRun.documentData) {
+        try {
+          docData = JSON.parse(testRun.documentData);
+        } catch (parseError) {
+          console.warn('Unable to parse document data JSON:', parseError);
+        }
+      }
+
+      setDocumentForm({
+        capabilityName: docData.capabilityName || testRun.capability || '',
+        description: docData.description || '',
+        introduction: formatLines(docData.introduction),
+        benchmarkGoals: formatLines(docData.benchmarkGoals),
+        testSetup: formatLines(docData.testSetup),
+        hardwareInfo: formatLines(docData.hardwareInfo),
+        scenarioFields: normalizeScenarioFields(docData),
+        performanceAnalysis: formatLines(docData.performanceAnalysis),
+        capacityPlanning: formatLines(docData.capacityPlanning),
+        conclusions: formatLines(docData.conclusions),
+        additionalNotes: formatLines(docData.additionalNotes),
+      });
+    } catch (error) {
+      console.error('Error fetching document data:', error);
+      showNotification(
+        'error',
+        'Failed to load narrative data',
+        error.response?.data?.message || error.message
+      );
+      resetDocumentForm();
+    } finally {
+      setDocumentLoading(false);
+    }
   };
 
   const handleSaveBaseline = async () => {
@@ -409,6 +550,46 @@ const CapabilityDetails = () => {
       );
     } finally {
       setBaselineSaving(false);
+    }
+  };
+
+  const handleSaveDocumentData = async () => {
+    if (!documentRunId) {
+      showNotification('error', 'No test run selected', 'Select a test run first');
+      return;
+    }
+
+    setDocumentSaving(true);
+    try {
+      const payload = {
+        capabilityName: documentForm.capabilityName.trim(),
+        description: documentForm.description.trim(),
+        introduction: parseLines(documentForm.introduction),
+        benchmarkGoals: parseLines(documentForm.benchmarkGoals),
+        testSetup: parseLines(documentForm.testSetup),
+        hardwareInfo: parseLines(documentForm.hardwareInfo),
+        performanceAnalysis: parseLines(documentForm.performanceAnalysis),
+        capacityPlanning: parseLines(documentForm.capacityPlanning),
+        conclusions: parseLines(documentForm.conclusions),
+        additionalNotes: parseLines(documentForm.additionalNotes),
+      };
+
+      for (let i = 1; i <= 10; i += 1) {
+        const value = documentForm.scenarioFields[i - 1] || '';
+        payload[`scenario${i}`] = parseLines(value);
+      }
+
+      await axios.post(API_ENDPOINTS.DOCUMENT_DATA(documentRunId), payload);
+      showNotification('success', 'Narrative data saved', 'Document data saved for the test run.');
+    } catch (error) {
+      console.error('Error saving document data:', error);
+      showNotification(
+        'error',
+        'Failed to save narrative data',
+        error.response?.data?.message || error.message
+      );
+    } finally {
+      setDocumentSaving(false);
     }
   };
 
@@ -893,6 +1074,156 @@ const CapabilityDetails = () => {
               </TableContainer>
             )}
           </DataTable>
+        )}
+      </Tile>
+
+      <Tile className="capability-document-data">
+        <div className="capability-table-header">
+          <h3>Test run narrative data</h3>
+          <p>Save the report builder narrative sections directly from this page.</p>
+        </div>
+        <div className="metadata-controls">
+          <Select
+            id="capability-document-data-select"
+            labelText="Select test run"
+            value={documentRunId}
+            onChange={(e) => setDocumentRunId(e.target.value)}
+            disabled={loading || testRuns.length === 0}
+          >
+            {testRuns.length === 0 ? (
+              <SelectItem value="" text="No test runs available" />
+            ) : (
+              testRuns.map((test) => (
+                <SelectItem
+                  key={test.id}
+                  value={String(test.id)}
+                  text={`${test.testName || 'Test Run'} · ${test.capability || 'Unknown capability'} (#${test.id})`}
+                />
+              ))
+            )}
+          </Select>
+          <Button
+            kind="primary"
+            onClick={handleSaveDocumentData}
+            disabled={!documentRunId || documentSaving || documentLoading}
+          >
+            {documentSaving ? 'Saving...' : 'Save narrative data'}
+          </Button>
+        </div>
+        {documentLoading ? (
+          <Loading description="Loading narrative data..." withOverlay={false} />
+        ) : (
+          <div className="document-data-form">
+            <div className="document-data-grid">
+              <TextInput
+                id="document-capability-name"
+                labelText="Capability name"
+                value={documentForm.capabilityName}
+                onChange={(e) => handleDocumentChange('capabilityName', e.target.value)}
+                placeholder="APIC-GQL"
+              />
+              <TextInput
+                id="document-description"
+                labelText="Description"
+                value={documentForm.description}
+                onChange={(e) => handleDocumentChange('description', e.target.value)}
+                placeholder="Demo report for APIC-GQL Capability."
+              />
+            </div>
+            <TextArea
+              id="document-introduction"
+              labelText="Introduction (one item per line)"
+              helperText="Each line becomes a separate paragraph."
+              value={documentForm.introduction}
+              onChange={(e) => handleDocumentChange('introduction', e.target.value)}
+              rows={4}
+            />
+            <TextArea
+              id="document-benchmark-goals"
+              labelText="Benchmark goals (one item per line)"
+              helperText="Each line becomes a separate bullet."
+              value={documentForm.benchmarkGoals}
+              onChange={(e) => handleDocumentChange('benchmarkGoals', e.target.value)}
+              rows={4}
+            />
+            <TextArea
+              id="document-test-setup"
+              labelText="Test setup (one item per line)"
+              helperText="Example: JMeter 5.6.3, Heap 4GB."
+              value={documentForm.testSetup}
+              onChange={(e) => handleDocumentChange('testSetup', e.target.value)}
+              rows={4}
+            />
+            <TextArea
+              id="document-hardware-info"
+              labelText="Hardware info (one item per line)"
+              helperText="Example: App nodes: 16 vCPU, 32GB RAM."
+              value={documentForm.hardwareInfo}
+              onChange={(e) => handleDocumentChange('hardwareInfo', e.target.value)}
+              rows={4}
+            />
+            <div className="document-scenarios">
+              <div className="document-scenarios-header">
+                <h4>Scenarios (one item per line)</h4>
+                <Button
+                  kind="ghost"
+                  size="sm"
+                  onClick={addScenarioField}
+                  disabled={documentForm.scenarioFields.length >= 10}
+                >
+                  Add scenario
+                </Button>
+              </div>
+              {documentForm.scenarioFields.map((scenario, index) => (
+                <div className="document-scenario" key={`scenario-${index}`}>
+                  <TextArea
+                    id={`document-scenario-${index + 1}`}
+                    labelText={`Scenario ${index + 1}`}
+                    value={scenario}
+                    onChange={(e) => handleScenarioChange(index, e.target.value)}
+                    rows={4}
+                  />
+                  {documentForm.scenarioFields.length > 1 && (
+                    <Button
+                      kind="ghost"
+                      size="sm"
+                      onClick={() => removeScenarioField(index)}
+                    >
+                      Remove
+                    </Button>
+                  )}
+                </div>
+              ))}
+            </div>
+            <TextArea
+              id="document-performance-analysis"
+              labelText="Performance analysis (one item per line)"
+              value={documentForm.performanceAnalysis}
+              onChange={(e) => handleDocumentChange('performanceAnalysis', e.target.value)}
+              rows={4}
+            />
+            <TextArea
+              id="document-capacity-planning"
+              labelText="Capacity planning (one item per line)"
+              value={documentForm.capacityPlanning}
+              onChange={(e) => handleDocumentChange('capacityPlanning', e.target.value)}
+              rows={4}
+            />
+            <TextArea
+              id="document-conclusions"
+              labelText="Conclusions (one item per line)"
+              value={documentForm.conclusions}
+              onChange={(e) => handleDocumentChange('conclusions', e.target.value)}
+              rows={4}
+            />
+            <TextArea
+              id="document-additional-notes"
+              labelText="Additional notes (one item per line)"
+              value={documentForm.additionalNotes}
+              onChange={(e) => handleDocumentChange('additionalNotes', e.target.value)}
+              rows={4}
+            />
+          </div>
         )}
       </Tile>
 
