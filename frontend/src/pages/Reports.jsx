@@ -56,7 +56,7 @@ const Reports = () => {
         response = await axios.get(API_ENDPOINTS.REPORTS_LIST);
       } catch (err) {
         console.log('Trying alternative endpoint...');
-        response = await axios.get('/api/v1/reports');
+        response = await axios.get(API_ENDPOINTS.REPORTS);
       }
       
       if (Array.isArray(response.data)) {

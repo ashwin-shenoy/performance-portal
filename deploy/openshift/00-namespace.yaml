@@ -4,4 +4,4 @@ metadata:
   name: perf-portal
   labels:
     app.kubernetes.io/name: performance-portal
-    app.kubernetes.io/part-of: durandhar
+    app.kubernetes.io/part-of: performance-portal

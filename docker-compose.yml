@@ -28,6 +28,10 @@ services:
       SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/performance_portal
       SPRING_DATASOURCE_USERNAME: postgres
       SPRING_DATASOURCE_PASSWORD: postgres
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      APP_SECURITY_USERNAME: admin
+      APP_SECURITY_PASSWORD: change-me-now
+      JWT_SECRET: change-me-with-a-long-random-secret
       UPLOAD_DIR: /app/data/uploads
       DIAGRAMS_DIR: /app/data/diagrams
       REPORTS_DIR: /app/data/reports
@@ -39,7 +43,7 @@ services:
       postgres:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/api/v1/capabilities"]
+      test: ["CMD", "curl", "-f", "-u", "admin:change-me-now", "http://localhost:8080/api/v1/capabilities"]
       interval: 15s
       timeout: 10s
       retries: 10

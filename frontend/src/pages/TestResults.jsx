@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Table, Card, Typography, Space, Button, Tag, Input, Select, Modal, Descriptions, message, Dropdown } from 'antd';
-import { SearchOutlined, EyeOutlined, DeleteOutlined, DownloadOutlined, FileTextOutlined, FilePdfOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
+import { SearchOutlined, EyeOutlined, DeleteOutlined, DownloadOutlined, FilePdfOutlined } from '@ant-design/icons';
 import dayjs from 'dayjs';
 import axios from '../utils/axios';
 import { API_ENDPOINTS } from '../config/api';
@@ -10,7 +9,6 @@ const { Title } = Typography;
 const { Search } = Input;
 
 const TestResults = () => {
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [testRuns, setTestRuns] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
@@ -109,10 +107,6 @@ const TestResults = () => {
     }
   };
 
-  const handleGenerateWordReport = (testRunId) => {
-    // Navigate to Report Builder for Word report customization
-    navigate(`/report-builder/${testRunId}`);
-  };
 
   const handleDownloadReport = async (testRunId) => {
     try {
@@ -236,13 +230,6 @@ const TestResults = () => {
                     label: 'Generate PDF',
                     icon: <FilePdfOutlined />,
                     onClick: () => handleGenerateReport(record.id),
-                    disabled: record.status !== 'COMPLETED',
-                  },
-                  {
-                    key: 'customize',
-                    label: 'Customize Report',
-                    icon: <FileTextOutlined />,
-                    onClick: () => handleGenerateWordReport(record.id),
                     disabled: record.status !== 'COMPLETED',
                   },
                 ],

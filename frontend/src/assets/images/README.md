@@ -1,6 +1,6 @@
 # Hamza Assets Directory
 
-This directory contains Hamza branding assets for the durandhar Performance Portal.
+This directory contains Hamza branding assets for the performance portal Performance Portal.
 
 ## Required Assets
 
@@ -8,7 +8,7 @@ Please add the following Hamza logo files to this directory:
 
 1. **hamza-logo.svg** - Hamza corporate logo (white version for dark backgrounds)
 2. **hamza-logo-blue.svg** - Hamza corporate logo (blue version for light backgrounds)
-3. **durandhar-logo.svg** - durandhar product logo
+3. **performance portal-logo.svg** - performance portal product logo
 4. **performance-icon.svg** - Performance testing icon
 
 ## Where to Get Hamza Assets

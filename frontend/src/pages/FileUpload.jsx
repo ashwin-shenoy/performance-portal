@@ -161,7 +161,7 @@ const FileUpload = () => {
   const generateReport = async (testRunId) => {
     try {
       console.log('Generating report for test run:', testRunId);
-      const response = await axios.post(`/api/v1/reports/generate/jmeter/${testRunId}`);
+      const response = await axios.post(API_ENDPOINTS.GENERATE_WORD_REPORT(testRunId));
       console.log('Report generated:', response.data);
       return response.data;
     } catch (error) {

@@ -11,9 +11,9 @@ const MainLayout = () => {
   return (
     <>
       <Theme theme="g100">
-        <Header aria-label="Hamza durandhar Hybrid Integration">
+        <Header aria-label="Hamza performance portal Hybrid Integration">
           <HeaderName prefix="Hamza">
-            durandhar Hybrid Integration
+            performance portal Hybrid Integration
           </HeaderName>
         </Header>
       </Theme>

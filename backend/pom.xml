@@ -12,11 +12,11 @@
         <relativePath/>
     </parent>
     
-    <groupId>com.hamza.durandhar</groupId>
+    <groupId>com.hamza.performanceportal</groupId>
     <artifactId>performance-portal</artifactId>
     <version>1.0.0</version>
-    <name>durandhar Performance Portal</name>
-    <description>Performance Test Reporting Portal for Hamza durandhar iPaaS</description>
+    <name>Performance Portal</name>
+    <description>Performance Test Reporting Portal for Hamza Performance Portal iPaaS</description>
     
     <properties>
         <java.version>17</java.version>

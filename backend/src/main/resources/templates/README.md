@@ -5,7 +5,7 @@
 Place your Word document templates (.docx files) in this directory:
 
 ```
-durandhar-performance-portal/backend/src/main/resources/templates/
+performance-portal/backend/src/main/resources/templates/
 ```
 
 ## 📝 Template Files

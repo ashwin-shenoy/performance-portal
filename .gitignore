@@ -1,23 +1,59 @@
-.DS_Store
-.vscode/
+# Environment files
+.env
+.env.local
+.env.production
+.env.*.local
+*.env
+
+# Build outputs
+backend/target/
+backend/logs/
+frontend/dist/
+frontend/node_modules/
+frontend/build/
+
+# IDE
 .idea/
+.vscode/
 *.iml
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Docker volumes (local development)
+postgres_data/
+app_data/
+
+# Sensitive files
+*.key
+*.pem
+.htpasswd
+*.p12
+*.jks
 
 # Logs
 *.log
 logs/
+npm-debug.log*
+
+# Testing
+coverage/
+.nyc_output/
+
+# Backup files
+*.bak
+*.backup
+*.sql.gz
+*.tar.gz
+
+# Temporary files
+tmp/
+temp/
 
 # Java
-backend/target/
 *.class
-
-# Node
-frontend/node_modules/
-frontend/dist/
-
-# Env
-.env
-.env.*
-
-# OS
-Thumbs.db

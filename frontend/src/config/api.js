@@ -1,68 +1,70 @@
 // API Configuration
-// All endpoints include /api/v1 prefix to match backend @RequestMapping
+// API base path is centralized here; endpoint constants are relative to this base.
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/v1';
 
 export const API_ENDPOINTS = {
   // Authentication
-  LOGIN: '/api/v1/auth/login',
-  REGISTER: '/api/v1/auth/register',
-  REFRESH: '/api/v1/auth/refresh',
+  LOGIN: '/auth/login',
+  REGISTER: '/auth/register',
+  REFRESH: '/auth/refresh',
   
   // File Upload
-  UPLOAD: '/api/v1/upload',
-  UPLOAD_TEST_RUN: '/api/v1/upload/test-run',
-  UPLOAD_STATUS: (id) => `/api/v1/upload/status/${id}`,
+  UPLOAD: '/upload',
+  UPLOAD_TEST_RUN: '/upload/test-run',
+  UPLOAD_STATUS: (id) => `/upload/status/${id}`,
   
   // Test Runs
-  TESTS: '/api/v1/tests',
-  TEST_BY_ID: (id) => `/api/v1/tests/${id}`,
+  TESTS: '/tests',
+  TEST_BY_ID: (id) => `/tests/${id}`,
   
   // Test Cases
-  TEST_CASES: '/api/v1/testcases',
-  TEST_CASE_BY_ID: (id) => `/api/v1/testcases/${id}`,
-  TEST_CASE_STATS: '/api/v1/testcases/stats/by-status',
-  TEST_CASE_STATISTICS: (testRunId) => `/api/v1/testcases/test-run/${testRunId}/statistics`,
+  TEST_CASES: '/testcases',
+  TEST_CASE_BY_ID: (id) => `/testcases/${id}`,
+  TEST_CASE_STATS: '/testcases/stats/by-status',
+  TEST_CASE_STATISTICS: (testRunId) => `/testcases/test-run/${testRunId}/statistics`,
   
   // Artifacts
-  ARTIFACTS: '/api/v1/artifacts',
-  ARTIFACT_BY_ID: (id) => `/api/v1/artifacts/${id}`,
-  ARTIFACTS_BY_TEST_RUN: (testRunId) => `/api/v1/artifacts/test-run/${testRunId}`,
-  ARTIFACT_DOWNLOAD: (id) => `/api/v1/artifacts/${id}/download`,
-  ARTIFACT_PREVIEW: (id) => `/api/v1/artifacts/${id}/preview`,
-  ARCHITECTURE_DIAGRAM: (testRunId) => `/api/v1/artifacts/test-run/${testRunId}/architecture-diagram`,
-  TEST_CASES_SUMMARY: (testRunId) => `/api/v1/artifacts/test-run/${testRunId}/test-cases-summary`,
+  ARTIFACTS: '/artifacts',
+  ARTIFACT_BY_ID: (id) => `/artifacts/${id}`,
+  ARTIFACTS_BY_TEST_RUN: (testRunId) => `/artifacts/test-run/${testRunId}`,
+  ARTIFACT_DOWNLOAD: (id) => `/artifacts/${id}/download`,
+  ARTIFACT_PREVIEW: (id) => `/artifacts/${id}/preview`,
+  ARCHITECTURE_DIAGRAM: (testRunId) => `/artifacts/test-run/${testRunId}/architecture-diagram`,
+  TEST_CASES_SUMMARY: (testRunId) => `/artifacts/test-run/${testRunId}/test-cases-summary`,
   
   // Capabilities
-  CAPABILITIES: '/api/v1/capabilities',
-  CAPABILITIES_DROPDOWN: '/api/v1/capabilities/dropdown',
-  CAPABILITIES_ACTIVE: '/api/v1/capabilities/active',
-  CAPABILITY_TEST_CASE_COUNTS: '/api/v1/capabilities/test-case-counts',
-  CAPABILITY_BASELINE: (id) => `/api/v1/capabilities/${id}/baseline`,
-  CAPABILITY_ARCHITECTURE_DIAGRAM: (id) => `/api/v1/capabilities/${id}/architecture-diagram`,
-  CAPABILITY_ARCHITECTURE_PREVIEW: (id) => `/api/v1/capabilities/${id}/architecture-diagram/preview`,
-  CAPABILITY_ARCHITECTURE_DOWNLOAD: (id) => `/api/v1/capabilities/${id}/architecture-diagram/download`,
-  CAPABILITY_ARCHITECTURE_DELETE: (id) => `/api/v1/capabilities/${id}/architecture-diagram`,
+  CAPABILITIES: '/capabilities',
+  CAPABILITIES_DROPDOWN: '/capabilities/dropdown',
+  CAPABILITIES_ACTIVE: '/capabilities/active',
+  CAPABILITY_TEST_CASE_COUNTS: '/capabilities/test-case-counts',
+  CAPABILITY_BASELINE: (id) => `/capabilities/${id}/baseline`,
+  CAPABILITY_ARCHITECTURE_DIAGRAM: (id) => `/capabilities/${id}/architecture-diagram`,
+  CAPABILITY_ARCHITECTURE_PREVIEW: (id) => `/capabilities/${id}/architecture-diagram/preview`,
+  CAPABILITY_ARCHITECTURE_DOWNLOAD: (id) => `/capabilities/${id}/architecture-diagram/download`,
+  CAPABILITY_ARCHITECTURE_DELETE: (id) => `/capabilities/${id}/architecture-diagram`,
   
   // Reports
-  GENERATE_REPORT: '/api/v1/reports/generate',
-  GENERATE_PDF_REPORT: (testRunId) => `/api/v1/reports/generate/jmeter/${testRunId}`,
-  GENERATE_WORD_REPORT: (testRunId) => `/api/v1/reports/generate/jmeter/${testRunId}`,
-  GENERATE_CAPABILITY_REPORT: '/api/v1/reports/generate/capability',
-  GENERATE_WORD_TEMPLATE: (capabilityName) => `/api/v1/reports/generate/word/${capabilityName}`,
-  REPORT_BY_ID: (id) => `/api/v1/reports/${id}`,
-  REPORT_VALIDATE_JMETER: (testRunId) => `/api/v1/reports/validate/jmeter/${testRunId}`,
-  REPORT_DOWNLOAD: (id) => `/api/v1/reports/download/${id}`,
-  REPORT_STATUS: (testRunId) => `/api/v1/reports/status/${testRunId}`,
-  REPORTS_BY_TEST_RUN: (testRunId) => `/api/v1/reports/test-run/${testRunId}`,
-  REPORTS_LIST: '/api/v1/reports/list',
-  DELETE_REPORT: (id) => `/api/v1/reports/${id}`,
+  GENERATE_REPORT: '/reports/generate',
+  GENERATE_PDF_REPORT: (testRunId) => `/reports/generate/jmeter/${testRunId}`,
+  GENERATE_WORD_REPORT: (testRunId) => `/reports/generate/jmeter/${testRunId}`,
+  GENERATE_WORD_AND_PDF_REPORT: (testRunId) => `/reports/generate/jmeter/${testRunId}/both`,
+  GENERATE_CAPABILITY_REPORT: '/reports/generate/capability',
+  GENERATE_WORD_TEMPLATE: (capabilityName) => `/reports/generate/word/${capabilityName}`,
+  REPORT_BY_ID: (id) => `/reports/${id}`,
+  REPORTS: '/reports',
+  REPORT_VALIDATE_JMETER: (testRunId) => `/reports/validate/jmeter/${testRunId}`,
+  REPORT_DOWNLOAD: (id) => `/reports/download/${id}`,
+  REPORT_STATUS: (testRunId) => `/reports/status/${testRunId}`,
+  REPORTS_BY_TEST_RUN: (testRunId) => `/reports/test-run/${testRunId}`,
+  REPORTS_LIST: '/reports/list',
+  DELETE_REPORT: (id) => `/reports/${id}`,
 
   // Document Data
-  DOCUMENT_DATA: (testRunId) => `/api/v1/test-runs/${testRunId}/document-data`,
+  DOCUMENT_DATA: (testRunId) => `/test-runs/${testRunId}/document-data`,
   
   // Analytics
-  ANALYTICS_SUMMARY: '/api/v1/analytics/summary',
-  ANALYTICS_TRENDS: '/api/v1/analytics/trends',
+  ANALYTICS_SUMMARY: '/analytics/summary',
+  ANALYTICS_TRENDS: '/analytics/trends',
 };
 
 export default API_BASE_URL;

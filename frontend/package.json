@@ -1,8 +1,8 @@
 {
-  "name": "durandhar-performance-portal-frontend",
+  "name": "performance-portal-frontend",
   "version": "1.0.0",
   "type": "module",
-  "description": "Frontend for durandhar Performance Portal",
+  "description": "Frontend for Performance Portal",
   "scripts": {
     "dev": "vite",
     "build": "vite build",

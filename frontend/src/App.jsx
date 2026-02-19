@@ -4,7 +4,6 @@ import FileUpload from './pages/FileUpload';
 import Reports from './pages/Reports';
 import UploadedFiles from './pages/UploadedFiles';
 import CapabilityDetails from './pages/CapabilityDetails';
-import ReportBuilder from './pages/ReportBuilder';
 import MainLayout from './components/Layout/MainLayout';
 
 function App() {
@@ -18,7 +17,6 @@ function App() {
           <Route path="uploaded-files" element={<UploadedFiles />} />
           <Route path="reports" element={<Reports />} />
           <Route path="capability-details" element={<CapabilityDetails />} />
-          <Route path="report-builder/:testRunId" element={<ReportBuilder />} />
         </Route>
         <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>

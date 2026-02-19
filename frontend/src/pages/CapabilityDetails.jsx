@@ -24,7 +24,7 @@ import {
   TextArea,
   FileUploader,
 } from '@carbon/react';
-import { Edit, Renew, DocumentBlank, Layers, Add, CheckmarkFilled, Upload, View, Download, TrashCan } from '@carbon/icons-react';
+import { Renew, Layers, Add, CheckmarkFilled, Upload, View, Download, TrashCan } from '@carbon/icons-react';
 import dayjs from 'dayjs';
 import axios from '../utils/axios';
 import { API_ENDPOINTS } from '../config/api';
@@ -872,7 +872,6 @@ const CapabilityDetails = () => {
     { key: 'buildNumber', header: 'Build Number' },
     { key: 'uploadDate', header: 'Upload Date' },
     { key: 'status', header: 'Status' },
-    { key: 'actions', header: 'Actions' },
   ];
 
   const getStatusTag = (status) => {
@@ -892,26 +891,6 @@ const CapabilityDetails = () => {
     buildNumber: test.buildNumber || 'N/A',
     uploadDate: test.uploadDate ? dayjs(test.uploadDate).format('YYYY-MM-DD HH:mm') : 'N/A',
     status: getStatusTag(test.status),
-    actions: (
-      <div className="capability-actions">
-        <Button
-          kind="primary"
-          size="sm"
-          renderIcon={Edit}
-          onClick={() => navigate(`/report-builder/${test.id}`)}
-        >
-          Add details
-        </Button>
-        <Button
-          kind="ghost"
-          size="sm"
-          renderIcon={DocumentBlank}
-          onClick={() => navigate(`/report-builder/${test.id}`)}
-        >
-          Open builder
-        </Button>
-      </div>
-    ),
   }));
 
   return (
@@ -1039,7 +1018,7 @@ const CapabilityDetails = () => {
       <Tile className="capability-table">
         <div className="capability-table-header">
           <h3>Choose a test run to add narrative details</h3>
-          <p>These details flow into the report builder and are stored with each test run.</p>
+          <p>These details are stored with each test run and used during report generation.</p>
         </div>
         {loading ? (
           <Loading description="Loading test runs..." withOverlay={false} />
@@ -1080,7 +1059,7 @@ const CapabilityDetails = () => {
       <Tile className="capability-document-data">
         <div className="capability-table-header">
           <h3>Test run narrative data</h3>
-          <p>Save the report builder narrative sections directly from this page.</p>
+          <p>Save narrative sections directly from this page.</p>
         </div>
         <div className="metadata-controls">
           <Select

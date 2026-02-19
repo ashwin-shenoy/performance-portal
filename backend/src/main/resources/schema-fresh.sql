@@ -1,5 +1,5 @@
 -- ============================================================================
--- Fresh Database Schema for durandhar Performance Portal
+-- Fresh Database Schema for Performance Portal
 -- PostgreSQL Database - Matches JPA Entity Definitions
 -- ============================================================================
 

@@ -1,7 +1,7 @@
-# durandhar Performance Portal - Backend
+# Performance Portal - Backend
 
 ## Overview
-Spring Boot backend application for the durandhar Performance Test Reporting Portal using Java Stack (Option C).
+Spring Boot backend application for the Performance Portal Performance Test Reporting Portal using Java Stack (Option C).
 
 ## Technology Stack
 - **Framework**: Spring Boot 3.2.2
@@ -25,7 +25,7 @@ Spring Boot backend application for the durandhar Performance Test Reporting Por
 backend/
 ├── src/
 │   ├── main/
-│   │   ├── java/com/hamza/durandhar/performance/
+│   │   ├── java/com/hamza/performanceportal/performance/
 │   │   │   ├── config/          # Configuration classes
 │   │   │   ├── controller/      # REST controllers
 │   │   │   ├── dto/             # Data Transfer Objects

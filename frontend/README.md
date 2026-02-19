@@ -1,6 +1,6 @@
-# durandhar Performance Portal - Frontend
+# Performance Portal - Frontend
 
-React-based frontend application for the durandhar Performance Portal.
+React-based frontend application for the Performance Portal.
 
 ## Tech Stack
 

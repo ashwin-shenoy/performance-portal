@@ -1,6 +1,6 @@
 spring:
   application:
-    name: durandhar-performance-portal
+    name: performance-portal
 
   datasource:
     url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/performance_portal}
@@ -14,7 +14,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
     show-sql: false
     properties:
       hibernate:
@@ -72,7 +72,7 @@ server:
 # Application Configuration
 app:
   jwt:
-    secret: ${JWT_SECRET:your-256-bit-secret-key-change-this-in-production}
+    secret: ${JWT_SECRET}
     expiration: 3600000
     refresh-expiration: 86400000
 
@@ -89,6 +89,9 @@ app:
     template-dir: ${TEMPLATE_DIR:/opt/performance-portal/templates}
 
   security:
+    user:
+      name: ${APP_SECURITY_USERNAME}
+      password: ${APP_SECURITY_PASSWORD}
     cors:
       allowed-origins: http://localhost:3000,http://localhost:5173
       allowed-methods: GET,POST,PUT,DELETE,OPTIONS
@@ -99,7 +102,7 @@ app:
 logging:
   level:
     root: INFO
-    com.hamza.durandhar.performance: DEBUG
+    com.hamza.performanceportal.performance: INFO
     org.springframework.web: INFO
     org.springframework.security: INFO
     org.hibernate.SQL: WARN
@@ -111,7 +114,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics
+        include: health,info
   endpoint:
     health:
-      show-details: always
+      show-details: when_authorized

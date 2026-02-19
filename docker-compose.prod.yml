@@ -1,0 +1,92 @@
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: perf-portal-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: performance_portal
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "127.0.0.1:5432:5432"  # Only bind to localhost
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./db-init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d performance_portal"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - perf-portal-network
+
+  backend:
+    image: ghcr.io/${GITHUB_REPOSITORY}-backend:${IMAGE_TAG:-latest}
+    container_name: perf-portal-backend
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:8080:8080"  # Only bind to localhost
+    environment:
+      # Database
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/performance_portal
+      SPRING_DATASOURCE_USERNAME: ${DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
+      
+      # JPA Configuration
+      SPRING_JPA_HIBERNATE_DDL_AUTO: ${DDL_AUTO:-validate}
+      
+      # Security
+      APP_SECURITY_USERNAME: ${APP_USERNAME}
+      APP_SECURITY_PASSWORD: ${APP_PASSWORD}
+      JWT_SECRET: ${JWT_SECRET}
+      
+      # CORS - production domains
+      APP_SECURITY_CORS_ALLOWED_ORIGINS: ${CORS_ORIGINS}
+      
+      # Storage
+      UPLOAD_DIR: /app/data/uploads
+      DIAGRAMS_DIR: /app/data/diagrams
+      REPORTS_DIR: /app/data/reports
+      TEMPLATE_DIR: /app/data/templates
+      
+      # JVM Options
+      JAVA_OPTS: "-Xmx2g -Xms1g -XX:+UseG1GC -XX:MaxGCPauseMillis=200"
+      
+      # Spring Profile
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILE:-production}
+    volumes:
+      - app_data:/app/data
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "-u", "${APP_USERNAME}:${APP_PASSWORD}", "http://localhost:8080/api/v1/capabilities"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    networks:
+      - perf-portal-network
+
+  frontend:
+    image: ghcr.io/${GITHUB_REPOSITORY}-frontend:${IMAGE_TAG:-latest}
+    container_name: perf-portal-frontend
+    restart: unless-stopped
+    ports:
+      - "80:8080"    # HTTP
+      - "443:8443"   # HTTPS (if configured)
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - perf-portal-network
+
+volumes:
+  postgres_data:
+    driver: local
+  app_data:
+    driver: local
+
+networks:
+  perf-portal-network:
+    driver: bridge
