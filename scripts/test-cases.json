@@ -1,0 +1,14 @@
+[
+  {
+    "testCaseName": "Checkout baseline",
+    "description": "Validate checkout flow at 200 VU steady traffic.",
+    "expectedBehavior": "P95 <= 1200ms, Avg <= 600ms, Throughput >= 45 req/s",
+    "priority": "HIGH"
+  },
+  {
+    "testCaseName": "Search baseline",
+    "description": "Validate search latency under steady traffic.",
+    "expectedBehavior": "P95 <= 900ms, Avg <= 450ms, Throughput >= 60 req/s",
+    "priority": "MEDIUM"
+  }
+]

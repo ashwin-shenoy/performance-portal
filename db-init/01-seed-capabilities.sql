@@ -1,0 +1,3 @@
+-- This file is intentionally minimal.
+-- Capability seed data is loaded by Hibernate/Spring Boot on startup.
+-- The database schema is auto-created by JPA (ddl-auto: update).
